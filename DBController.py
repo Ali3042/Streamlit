@@ -161,9 +161,11 @@ class Data():
                 filters[i] = sum(filters[i], [])
             except:
                pass
-            query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+            temp = f"({', '.join(map(repr, filters[i]))}"
+            query += f"\nAND {i} in {temp})"
         for i in st.session_state.selections:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, st.session_state.selections[i]))})"}"  
+            temp = f"({', '.join(map(repr, st.session_state.selections[i]))})"
+            query += f"\nAND {i} in {temp}"  
         countBlock = c.execute(query).fetchone()
      
      if st.session_state.selections == {}:

@@ -1,0 +1,12 @@
+15/11/2023 15:58:28 - table Aims has no column named Expenses
+15/11/2023 16:04:28 - NOT NULL constraint failed: Aims.RateAdequecy
+15/11/2023 16:16:05 - near "INSERT": syntax error
+16/11/2023 12:55:58 - near ""GrossWP"": syntax error
+16/11/2023 12:56:02 - near ""GrossWP"": syntax error
+16/11/2023 12:56:41 - near ""GrossWP"": syntax error
+16/11/2023 12:56:46 - near ""GrossWP"": syntax error
+16/11/2023 12:56:48 - near ""GrossWP"": syntax error
+16/11/2023 12:59:32 - near ""GrossWP"": syntax error
+16/11/2023 13:00:36 - near ""GrossWP"": syntax error
+16/11/2023 13:02:14 - near ""GrossWP"": syntax error
+16/11/2023 13:04:22 - near ""GrossWP"": syntax error

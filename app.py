@@ -35,7 +35,9 @@ def filterBar():
     with col4:
         coverage = st.multiselect("Coverage", data.coverageList)
            
-    st.session_state.selections = generate_selections_dict(broker, sub_class, country, coverage, LoB)
+    if st.session_state.selections != generate_selections_dict(broker, sub_class, country, coverage, LoB):
+        st.session_state.selections = generate_selections_dict(broker, sub_class, country, coverage, LoB)
+        st.rerun()
 
 dbc = DBController('database.db')  
 

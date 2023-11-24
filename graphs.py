@@ -591,7 +591,7 @@ def show_graph_9():
     chart_data = []
     for i in list(data.keys()):
         coord = coords[i]
-        exposure = data[i]/1000
+        exposure = data[i]/10000
 
         # Determine the color based on exposure
         if exposure > maxEpo[i]/1000:

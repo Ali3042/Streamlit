@@ -79,13 +79,15 @@ class Data():
   @property
   def subClassList(self):
     c = self.__dbc.db.cursor()
-    data = c.execute(f"""
-                SELECT SubClass
-                FROM Policys
-                WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.LoB))})"}
-                AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
-                """).fetchall()
-    
+    if 'LineOfBusiness' in st.session_state.selections:
+        data = c.execute(f"""
+                    SELECT SubClass
+                    FROM Policys
+                    WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.selections['LineOfBusiness']))})"}
+                    AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    """).fetchall()
+    else:
+        return []
     classNames = []
     for i in data:
       if i['SubClass'] not in classNames:
@@ -111,12 +113,15 @@ class Data():
   @property
   def coverageList(self):
     c = self.__dbc.db.cursor()
-    data = c.execute(f"""
-                SELECT Coverage
-                FROM Policys
-                WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.LoB))})"} 
-                AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
-                """).fetchall()
+    if 'LineOfBusiness' in st.session_state.selections:
+        data = c.execute(f"""
+                    SELECT Coverage
+                    FROM Policys
+                    WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.selections['LineOfBusiness']))})"} 
+                    AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    """).fetchall()
+    else:
+        return []
     
     coverageNames = []
     for i in data:
@@ -196,8 +201,6 @@ class Graph():
     
   def GWP(self, filters):  
     c = self.__dbc.db.cursor()
-    if st.session_state.LoB:
-        filters['LineOfBusiness'] = st.session_state.LoB
     if filters == {}:
         data = c.execute("""
                     SELECT GrossWP, StartDate
@@ -348,8 +351,6 @@ class Graph():
   
   def HitRate(self, filters): 
     c = self.__dbc.db.cursor()
-    if st.session_state.LoB:
-        filters['LineOfBusiness'] = st.session_state.LoB
     if filters == {}:
         data = c.execute("""
                     SELECT SubmissionStatus, StartDate
@@ -458,8 +459,6 @@ class Graph():
 
   def ELR(self, filters): 
     c = self.__dbc.db.cursor()
-    if st.session_state.LoB:
-        filters['LineOfBusiness'] = st.session_state.LoB
     if filters == {}:
         data = c.execute("""
                     SELECT StartDate, GrossWP
@@ -550,13 +549,10 @@ class Graph():
                 """).fetchall()
     
     ELRAims = {}
-    if filters != {}:
-        for i in data:
-          ELRAims[i['Date'][:7]] = i['ELR']
+    for i in data:
+        ELRAims[i['Date'][:7]] = i['ELR']
         
         aim = dict(sorted(ELRAims.items()))
-    else:
-        aim = {}
     
     pred = predict(cul)
     if pred != {}:
@@ -568,8 +564,6 @@ class Graph():
 
   def RateAdequecy(self, filters):
     c = self.__dbc.db.cursor()
-    if st.session_state.LoB:
-        filters['LineOfBusiness'] = st.session_state.LoB
     if filters == {}:
         data = c.execute("""
                     SELECT StartDate, GrossWP, TechnicalWP

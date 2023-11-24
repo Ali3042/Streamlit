@@ -16,7 +16,6 @@ def generate_selections_dict(broker, sub_class, country, coverage, LoB):
         selections['Coverage'] = coverage
     if LoB:
         selections['LineOfBusiness'] = LoB
-        st.session_state['LoB'] = LoB
     return selections
 
 def filterBar():
@@ -65,9 +64,6 @@ if 'selections' not in st.session_state:
 # Initialize the page state if it doesn't exist
 if 'page' not in st.session_state:
     st.session_state['page'] = 'external'
-    
-if 'LoB' not in st.session_state:
-    st.session_state['LoB'] = []
    
 
 if 'basket' not in st.session_state:

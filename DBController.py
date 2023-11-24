@@ -183,7 +183,8 @@ class Data():
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
         for i in st.session_state.selections:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, st.session_state.selections[i]))})"}"
+            temp = f"({', '.join(map(repr, st.session_state.selections[i]))})"
+            query += f"\nAND {i} in {temp}"
         countCurrent = c.execute(query).fetchone()
         
      return countBlock['count'] / countCurrent['count']
@@ -212,7 +213,8 @@ class Graph():
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
         for i in filters:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+            temp = f"({', '.join(map(repr, filters[i]))})"
+            query += f"\nAND {i} in {temp}"
         data = c.execute(query).fetchall()
       
     
@@ -294,7 +296,8 @@ class Graph():
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
         for i in filters:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+            temp = f"({', '.join(map(repr, filters[i]))})"
+            query += f"\nAND {i} in {temp}"
         data = c.execute(query).fetchall()
     
     new = {}
@@ -363,7 +366,8 @@ class Graph():
                     AND  Policys.BrokerID == Brokers.BrokerID
                     """
         for i in filters:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+            temp = f"({', '.join(map(repr, filters[i]))})"
+            query += f"\nAND {i} in {temp}"
             
         data = c.execute(query).fetchall()
         
@@ -487,8 +491,9 @@ class Graph():
         
 
         for i in filters:
-            query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
-            countquery += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+            temp = f"({', '.join(map(repr, filters[i]))})"
+            query += f"\nAND {i} in {temp}"
+            countquery += f"\nAND {i} in {temp}"
         data = c.execute(query).fetchall()
         countdata = c.execute(countquery).fetchone()
         
@@ -580,7 +585,8 @@ class Graph():
                   AND Policys.BrokerID == Brokers.BrokerID
                   """ 
       for i in filters:
-          query += f"\nAND {i} in {f"({', '.join(map(repr, filters[i]))})"}"
+          temp = f"({', '.join(map(repr, filters[i]))})"
+          query += f"\nAND {i} in {temp}"
       data = c.execute(query)
     
     MonthGWP = {}

@@ -447,6 +447,7 @@ def show_graph_5():
     fig = make_subplots(specs=[[{"secondary_y": False}]])
 
     # Add a line for the measure of the number of inquiries that make it to a quote
+
     fig.add_trace(
         go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), mode='lines', name='Target rate', line=dict(color='#602320'))
     )

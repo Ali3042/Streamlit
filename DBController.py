@@ -622,7 +622,6 @@ class Graph():
         pred[list(cul)[-1]] = cul[list(cul)[-1]]
         pred = dict(sorted(pred.items()))
 
-    rateAdaquecyAims = {}
     data = c.execute("""
                 SELECT Date, RateAdequecy
                 FROM Aims  
@@ -631,9 +630,10 @@ class Graph():
     
     aim = {}
     for i in data:
-      aim[i['Date']] = i['RateAdequecy']
+      print(i['Date'][:7])
+      aim[i['Date'][:7]] = i['RateAdequecy']
       
-    aim = dict(sorted(rateAdaquecyAims.items()))
+    aim = dict(sorted(aim.items()))
       
     return {'acc': acc, 'aim': aim, 'cul': cul, 'pred': pred}
   

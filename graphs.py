@@ -516,7 +516,12 @@ def show_graph_6():
         xaxis_title="Year",
         yaxis_title="RARC",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
-        font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple")
+        font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple"),
+        xaxis=dict(
+            tickmode='array',
+            tickvals=list(data['aim'].keys()),
+            ticktext=[f"{int(year)} H2" if isinstance(year, float) and year % 1 != 0 else str(int(year)) for year in data['aim'].keys()]
+        )
     )
 
     # Display the figure

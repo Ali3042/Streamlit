@@ -71,9 +71,10 @@ if 'basket' not in st.session_state:
 
 # Check which page to display
 if st.session_state['page'] == 'internal':
-    st.set_page_config(page_title='MVP Dashboard - Internal Factors', layout='wide') 
+    st.set_page_config(page_title='Portfolio Management a Digital Twin', layout='wide') 
     data = Data(dbc)
 
+    st.title("Internal Factors Dashboard")
     # Main content after a top button is clicked
     if True:
         filterBar()
@@ -132,8 +133,10 @@ if st.session_state['page'] == 'internal':
  
 
 else:
-    st.set_page_config(page_title='MVP Dashboard - External Factors', layout='wide') 
-
+    st.set_page_config(page_title='Portfolio Management Digital Twin', layout='wide')
+    
+    st.title("External Factors Dashboard")
+    
     filterBar()
 
     # Sidebar for external factors

@@ -23,7 +23,7 @@ coefficients = {
         'retention': 0.002, # For each 1% increase in retention rates, the value of retaining customers increases by 0.2%.
         'hit': 0.005, # For each 1% increase in retention rates, hit ratio increases by 0.5%.
         'adequacy': 0.01, # For each 1% increase in retention rates, rate adequacy increases by 1%.
-        'ELR': 0.006, # For each 1% increase in retention rates, ELR increases by 0.6%.
+        'ELR': -0.006, # For each 1% increase in retention rates, ELR increases by 0.6%.
         'RARC': 0.005 # For each 1% increase in retention rates, RARC increases by 0.5%.
     },
     # Coefficients for the impact of inflation rate changes
@@ -41,7 +41,7 @@ coefficients = {
         'retention': 0.02, # For each 1% increase in rate adequacy, the value of retaining customers increases by 2%.
         'hit': -0.015, # For each 1% increase in rate adequacy, hit ratio decreases by 1.5%.
         'adequacy': -0.10, # For each 1% increase in rate adequacy, rate adequacy itself decreases by 10% (counteracting effect).
-        'ELR': 0.01, # For each 1% increase in rate adequacy, ELR increases by 1%.
+        'ELR': -0.01, # For each 1% increase in rate adequacy, ELR increases by 1%.
         'RARC': 0.02 # For each 1% increase in rate adequacy, RARC increases by 2%.
     },
     # Coefficients for the impact of submission-to-quote rate changes
@@ -414,7 +414,7 @@ def show_graph_4():
     )
     
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), mode='lines+markers', name='Prejected hit rate', line=dict(color='black'), marker=dict(color='black'))
+        go.Scatter(x=list(future.keys()), y=list(future.values()), mode='lines+markers', name='Prejected ELR', line=dict(color='black'), marker=dict(color='black'))
     )
 
     # Customize the layout
@@ -596,9 +596,9 @@ def show_graph_9():
 
         # Determine the color based on exposure
         if exposure > maxEpo[i]/1000:
-            color = [255, 0, 0, 160]    # Red for overexposed
+            color = [173, 27, 2 , 160]    # Red for overexposed
         else:
-            color = [0, 255, 0, 160]  # Green for others
+            color = [243, 190, 38 , 160]  # Green for others
 
         chart_data.append([coord[0], coord[1], exposure, color])
 

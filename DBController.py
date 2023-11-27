@@ -405,11 +405,8 @@ class Graph():
                 """).fetchall()
     
     HitAims = {}
-    if filters != {}:
-        total = 0
-        for i in data:
-          total += i['HitRate']
-          HitAims[i['Date'][:7]] = total
+    for i in data:
+      HitAims[i['Date'][:7]] = i['HitRate']
 
       
     aim = dict(sorted(HitAims.items()))

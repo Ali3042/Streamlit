@@ -630,7 +630,6 @@ class Graph():
     
     aim = {}
     for i in data:
-      print(i['Date'][:7])
       aim[i['Date'][:7]] = i['RateAdequecy']
       
     aim = dict(sorted(aim.items()))

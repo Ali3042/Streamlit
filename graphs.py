@@ -340,6 +340,10 @@ def show_graph_3():
 
     # Create a line chart for hit ratios
     fig = make_subplots(specs=[[{"secondary_y": False}]])
+    
+    fig.add_trace(
+        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), mode='lines', name='Target StB', line=dict(color='#602320'))
+    )
 
     fig.add_trace(
         go.Scatter(x=list(bfuture.keys()), y=list(bfuture.values()), mode='lines+markers', name='Projected QtB', line=dict(color='black'))

@@ -66,7 +66,7 @@ class Data():
     data = c.execute("""
                 SELECT Name
                 FROM Brokers, Policys
-                WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', StartDate) == '2023'      
                 """).fetchall()
     
     brokerNames = []
@@ -84,7 +84,7 @@ class Data():
                     SELECT SubClass
                     FROM Policys
                     WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.selections['LineOfBusiness']))})"}
-                    AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    AND strftime('%Y', StartDate) == '2023' 
                     """).fetchall()
     else:
         return []
@@ -100,7 +100,7 @@ class Data():
     data = c.execute("""
                 SELECT LineOfBusiness
                 FROM Policys
-                WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', StartDate) == '2023'       
                 """).fetchall()
     
     lobNames = []
@@ -118,7 +118,7 @@ class Data():
                     SELECT Coverage
                     FROM Policys
                     WHERE LineOfBusiness in {f"({', '.join(map(repr, st.session_state.selections['LineOfBusiness']))})"} 
-                    AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    AND strftime('%Y', StartDate) == '2023' 
                     """).fetchall()
     else:
         return []
@@ -136,7 +136,7 @@ class Data():
     data = c.execute("""
                 SELECT Jurisdiction
                 FROM Policys   
-                WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', StartDate) == '2023'      
                 """).fetchall()
     
     placeNames = []
@@ -151,13 +151,13 @@ class Data():
         countBlock = c.execute("""
                     SELECT COUNT(PolicyID) as count
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchone()
      else:
         query = """SELECT COUNT(PolicyID) as count
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
@@ -177,13 +177,13 @@ class Data():
         countCurrent = c.execute("""
                     SELECT COUNT(PolicyID) as count
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchone()
      else:
         query = """SELECT COUNT(PolicyID) as count
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023'  
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
@@ -205,13 +205,13 @@ class Graph():
         data = c.execute("""
                     SELECT GrossWP, StartDate
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchall()
     else:
         query = """SELECT GrossWP, StartDate
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023'  
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
@@ -242,7 +242,7 @@ class Graph():
       data = c.execute("""
                 SELECT Date, GWP
                 FROM Aims
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')       
+                WHERE strftime('%Y', Date) == '2023'     
                 """).fetchall()
       total = 0
       for i in data:
@@ -257,30 +257,9 @@ class Graph():
     if pred != {}:
         pred[list(cul)[-1]] = cul[list(cul)[-1]]
         pred = dict(sorted(pred.items()))
- 
+         
     
     return {'acc' : acc, 'cul': cul, 'aim' : aim, 'pred': pred}
-  
-  @property
-  def GWPYear(self):  
-    c = self.__dbc.db.cursor()
-    data = c.execute("""
-                SELECT GrossWP, StartDate
-                FROM Policys
-                WHERE strftime('%Y', StartDate) != strftime('%Y', 'now')      
-                """).fetchall()
-    
-    YearGWP = {}
-    for i in data:
-      if i['StartDate'][:4] not in YearGWP:
-        YearGWP[i['StartDate'][:4]] = i['GrossWP']
-      else:
-        YearGWP[i['StartDate'][:4]] += i['GrossWP']
-
-    acc = dict(sorted(YearGWP.items()))
-    
-    return acc
-
 
   def BusinessType(self, filters):  
     c = self.__dbc.db.cursor()
@@ -288,13 +267,13 @@ class Graph():
         data = c.execute("""
                     SELECT StartDate , PrevPolicy, GrossWP
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')     
+                    WHERE strftime('%Y', StartDate) == '2023'      
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchall()
     else:
         query = """SELECT StartDate , PrevPolicy, GrossWP
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
@@ -323,15 +302,14 @@ class Graph():
     for i in continued:
       contTotal  += continued[i]
       totalTotal += continued[i] + new[i]
-      YearRetention[i] = (contTotal / totalTotal) * 100
-      
+      YearRetention[i] = (contTotal / totalTotal) * 100      
         
     retention = dict(sorted(YearRetention.items()))
     
     data = c.execute("""
                 SELECT Date, RetentionRate
                 FROM Aims
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', Date) == '2023'      
                 """).fetchall()
     
     RetentionAims = {}
@@ -355,14 +333,14 @@ class Graph():
         data = c.execute("""
                     SELECT SubmissionStatus, StartDate
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchall()
     else:
         query ="""
                     SELECT SubmissionStatus, StartDate
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND  Policys.BrokerID == Brokers.BrokerID
                     """
@@ -401,7 +379,7 @@ class Graph():
     data = c.execute("""
                 SELECT Date, HitRate
                 FROM Aims
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', Date) == '2023'       
                 """).fetchall()
     
     HitAims = {}
@@ -435,7 +413,7 @@ class Graph():
                 SELECT Name, GrossWP, StartDate
                 FROM Policys, Brokers
                 WHERE Policys.BrokerID = Brokers.BrokerID     
-                AND strftime('%Y', StartDate) == strftime('%Y', 'now')  
+                AND strftime('%Y', StartDate) == '2023'  
                 AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                 """).fetchall() 
         
@@ -460,28 +438,28 @@ class Graph():
         data = c.execute("""
                     SELECT StartDate, GrossWP
                     FROM Policys   
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchall()
         percentage = 1
     else:
         query = """SELECT GrossWP, StartDate
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
         
         countquery ="""SELECT COUNT(GrossWP) as count
                     FROM Policys, Brokers
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     AND Policys.BrokerID == Brokers.BrokerID
                     """ 
                     
         count = c.execute("""SELECT COUNT(GrossWP) as count
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                    WHERE strftime('%Y', StartDate) == '2023' 
                     AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                 """).fetchone()
         
@@ -512,7 +490,7 @@ class Graph():
     data = c.execute("""
                 SELECT Date, ClaimLoss
                 FROM Aims   
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')    
+                WHERE strftime('%Y', Date) == '2023'   
                 """).fetchall()
 
 
@@ -542,7 +520,7 @@ class Graph():
     data = c.execute("""
                 SELECT Date, ELR
                 FROM Aims
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')      
+                WHERE strftime('%Y', Date) == '2023'      
                 """).fetchall()
     
     ELRAims = {}
@@ -565,13 +543,13 @@ class Graph():
         data = c.execute("""
                     SELECT StartDate, GrossWP, TechnicalWP
                     FROM Policys
-                    WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')  
+                    WHERE strftime('%Y', StartDate) == '2023'  
                     AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                     """).fetchall()
     else:
       query = """SELECT GrossWP, StartDate, TechnicalWP
                   FROM Policys, Brokers
-                  WHERE strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                  WHERE strftime('%Y', StartDate) == '2023'  
                   AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                   AND Policys.BrokerID == Brokers.BrokerID
                   """ 
@@ -605,8 +583,8 @@ class Graph():
     MonthRate = {}
     MonthRateCul = {}
     for i in MonthGWP:
-      MonthRate[i] = (MonthGWP[i] / MonthTWP[i] - 1) * 100
-      MonthRateCul[i] = (MonthGWPCul[i] / MonthTWPCul[i] - 1) * 100
+      MonthRate[i] = ((MonthGWP[i] - MonthTWP[i]) / MonthTWP[i]) * 100
+      MonthRateCul[i] = ((MonthGWPCul[i] - MonthTWPCul[i]) / MonthTWPCul[i]) * 100
       
    
 
@@ -622,7 +600,7 @@ class Graph():
     data = c.execute("""
                 SELECT Date, RateAdequecy
                 FROM Aims  
-                WHERE strftime('%Y', Date) == strftime('%Y', 'now')    
+                WHERE strftime('%Y', Date) == '2023'   
                 """).fetchall()
     
     aim = {}
@@ -631,6 +609,7 @@ class Graph():
       
     aim = dict(sorted(aim.items()))
       
+    print(acc, cul)
     return {'acc': acc, 'aim': aim, 'cul': cul, 'pred': pred}
   
 
@@ -641,7 +620,7 @@ class Graph():
                 SELECT SubmissionStatus, Name, StartDate
                 FROM Policys, Brokers
                 WHERE Policys.BrokerID = Brokers.BrokerID 
-                AND strftime('%Y', StartDate) == strftime('%Y', 'now') 
+                AND strftime('%Y', StartDate) == '2023' 
                 AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')     
                 """).fetchall()
     
@@ -670,7 +649,7 @@ class Graph():
     data = c.execute("""
                 SELECT PolicyLimit, StartDate, Jurisdiction
                 FROM Policys    
-                WHERE strftime('%Y', StartDate) == strftime('%Y', 'now')  
+                WHERE strftime('%Y', StartDate) == '2023'   
                 AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
                 """).fetchall()
     
@@ -682,33 +661,68 @@ class Graph():
       
     return exposure
   
-  @property
-  def RARC(self):
-    data = Graph(self.__dbc).GWPYear
+
+  def RARC(self, filters):
+    c = self.__dbc.db.cursor()
+    if filters == {}:
+        data = c.execute("""
+                    SELECT GrossWP, StartDate
+                    FROM Policys
+                    WHERE (strftime('%Y', StartDate) == '2023' OR strftime('%Y', StartDate) == '2022')
+                    AND  strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
+                    """).fetchall()
+    else:
+        query = """SELECT GrossWP, StartDate
+                    FROM Policys, Brokers
+                    WHERE (strftime('%Y', StartDate) == '2023' OR strftime('%Y', StartDate) == '2022')
+                    AND strftime('%Y %m %d', StartDate) <= strftime('%Y %m %d', 'now')
+                    AND Policys.BrokerID == Brokers.BrokerID
+                    """ 
+        for i in filters:
+            temp = f"({', '.join(map(repr, filters[i]))})"
+            query += f"\nAND {i} in {temp}"
+        data = c.execute(query).fetchall()
     
-    YearRARC = {}
+    YearGWP = {}
     for i in data:
-      if str(int(i)-1) not in data:
-        YearRARC[i] = 0
+      if i['StartDate'][:7] not in YearGWP:
+        YearGWP[i['StartDate'][:7]] = i['GrossWP']
       else:
-        YearRARC[i] = (data[i] - data[str(int(i)-1)]) / data[str(int(i)-1)] * 100
+        YearGWP[i['StartDate'][:7]] += i['GrossWP']
+      
+    acc = dict(sorted(YearGWP.items()))
+
+    YearRARC = {}
+    YearRARCCul = {}
+    totalLast = 0
+    totalCurrent = 0
+    for i in acc:
+      if i.split("-")[0] != "2022":
+        lastI = "2022-"+i.split("-")[1]
+        YearRARC[i] = (acc[i] - acc[lastI]) / acc[lastI] * 100
+        totalCurrent += acc[i]
+        totalLast += acc[lastI]
+        YearRARCCul[i] = (totalCurrent - totalLast) / totalLast * 100
         
     acc = dict(sorted(YearRARC.items()))
+    cul = dict(sorted(YearRARCCul.items()))
+    
 
     c = self.__dbc.db.cursor()
     data = c.execute("""
                 SELECT Date, RARC
-                FROM Aims        
+                FROM Aims   
+                WHERE strftime('%Y', Date) == '2023' 
                 """).fetchall()
     
     aim = {}
     for i in data:
-      aim[i['Date'][:4]] = i['RARC']    
+      aim[i['Date'][:7]] = i['RARC']    
       
-    pred = predict(acc)
-    pred[list(acc)[-1]] = acc[list(acc)[-1]]
+    pred = predict(cul)
+    pred[list(cul)[-1]] = cul[list(cul)[-1]]
     pred = dict(sorted(pred.items()))
 
-    return {'acc': acc, 'aim' : aim, 'pred': pred}
+    return {'acc': acc, 'aim' : aim, 'pred': pred, 'cul': cul}
         
 dbc = DBController("database.db")

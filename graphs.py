@@ -6,79 +6,86 @@ from plotly.subplots import make_subplots
 from dicts import coords, maxEpo
 import pydeck as pdk
 
+month_map = {
+    1: 'Jan', 2: 'Feb', 3: 'Mar', 4: 'Apr', 5: 'May', 6: 'Jun',
+    7: 'Jul', 8: 'Aug', 9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Dec'
+}
 
 coefficients = {
-    # Coefficients for the impact of interest rate changes
     'interest': {
-        'GWP': -0.015, # For each 1% decrease in interest rates, GWP decreases by 1.5%.
-        'retention': 0.005, # For each 1% decrease in interest rates, retention increases by 0.5%.
-        'hit': -0.01, # For each 1% decrease in interest rates, hit ratio decreases by 1%.
-        'adequacy': 0.015, # For each 1% decrease in interest rates, rate adequacy increases by 1.5%.
-        'ELR': 0.005, # For each 1% decrease in interest rates, ELR increases by 0.5%.
-        'RARC': -0.01 # For each 1% decrease in interest rates, RARC decreases by 1%.
+        'GWP': 0.01,
+        'retention': -0.005,
+        'sub': 0.002,
+        'ELR': 0.003,
+        'rate': -0.01,
+        'RARC': 0.015
     },
-    # Coefficients for the impact of retention rate changes
-    'retention_rate': {
-        'GWP': 0.006, # For each 1% increase in retention rates, GWP increases by 0.6%.
-        'retention': 0.002, # For each 1% increase in retention rates, the value of retaining customers increases by 0.2%.
-        'hit': 0.005, # For each 1% increase in retention rates, hit ratio increases by 0.5%.
-        'adequacy': 0.01, # For each 1% increase in retention rates, rate adequacy increases by 1%.
-        'ELR': -0.006, # For each 1% increase in retention rates, ELR increases by 0.6%.
-        'RARC': 0.005 # For each 1% increase in retention rates, RARC increases by 0.5%.
-    },
-    # Coefficients for the impact of inflation rate changes
     'inflation': {
-        'GWP': 0.03, # For each 1% increase in inflation, GWP increases by 3%.
-        'retention': 0.01, # For each 1% increase in inflation, the value of retaining customers increases by 1%.
-        'hit': -0.02, # For each 1% increase in inflation, hit ratio decreases by 2%.
-        'adequacy': 0.03, # For each 1% increase in inflation, rate adequacy increases by 3%.
-        'ELR': 0.02, # For each 1% increase in inflation, ELR increases by 2%.
-        'RARC': -0.015 # For each 1% increase in inflation, RARC decreases by 1.5%.
+        'GWP': -0.02,
+        'retention': 0.0,
+        'sub': -0.005,
+        'ELR': 0.02,
+        'rate': -0.015,
+        'RARC': 0.01
     },
-    # Coefficients for the impact of rate adequacy changes
-    'rate_adequacy': {
-        'GWP': 0.10, # For each 1% increase in rate adequacy, GWP increases by 10%.
-        'retention': 0.02, # For each 1% increase in rate adequacy, the value of retaining customers increases by 2%.
-        'hit': -0.015, # For each 1% increase in rate adequacy, hit ratio decreases by 1.5%.
-        'adequacy': -0.10, # For each 1% increase in rate adequacy, rate adequacy itself decreases by 10% (counteracting effect).
-        'ELR': -0.01, # For each 1% increase in rate adequacy, ELR increases by 1%.
-        'RARC': 0.02 # For each 1% increase in rate adequacy, RARC increases by 2%.
+    'marketRARC': {
+        'GWP': 0.015,
+        'retention': 0.01,
+        'sub': 0.008,
+        'ELR': -0.01,
+        'rate': 0.02,
+        'RARC': 0.025
     },
-    # Coefficients for the impact of submission-to-quote rate changes
-    'sub_to_quote': {
-        'GWP': -0.006, # For each 10% decrease in sub-to-quote rates, GWP decreases by 6%.
-        'retention': -0.005, # For each 10% decrease in sub-to-quote rates, the value of retaining customers decreases by 5%.
-        'hit': -0.005, # For each 10% decrease in sub-to-quote rates, hit ratio decreases by 5%.
-        'adequacy': 0.003, # For each 10% decrease in sub-to-quote rates, rate adequacy increases by 3%.
-        'ELR': -0.003, # For each 10% decrease in sub-to-quote rates, ELR decreases by 3%.
-        'RARC': 0.003 # For each 10% decrease in sub-to-quote rates, RARC increases by 3%.
+    'subVolumes': {
+        'GWP': 0.003,
+        'retention': 0.002,
+        'sub': 0.0015,
+        'ELR': -0.0005,
+        'rate': 0.001,
+        'RARC': -0.001
     },
-    "Price": {
-        "GWP": 0.0065,  # Higher prices might lead to lower GWP due to reduced customer acquisition.
-        "retention": -0.006,  # Higher prices could decrease retention rate as customers seek cheaper options.
-        "hit": -0.005,  # Higher prices might reduce hit ratio due to lower customer acquisition rates.
-        "adequacy": 0.007,  # Higher prices typically indicate better rate adequacy.
-        "ELR": -0.004,  # Price increases could lead to a lower ELR if the premium increase is higher than the increase in expected losses.
-        "RARC": 0.005   # High prices could improve RARC by leading to better margins.
+    'retention': {
+        'GWP': 0.0025,
+        'retention': 0.0035,
+        'sub': 0.001,
+        'ELR': -0.001,
+        'rate': 0.0005,
+        'RARC': -0.0005
     },
-    "Risk Appetite": {
-        "GWP": 0.006,  # A higher risk appetite can increase GWP as more policies are underwritten.
-        "retention": 0,   # Risk appetite might not have a direct impact on retention rates.
-        "hit": 0.004,  # A higher risk appetite can improve the hit ratio by accepting more proposals.
-        "adequacy": -0.004,  # Higher risk appetite could decrease rate adequacy if not managed properly.
-        "ELR": 0.005,  # Increased risk appetite could potentially increase the ELR.
-        "RARC": 0    # Risk appetite might increase RARC if it leads to more profitable underwriting, but it could also decrease it if risks are not properly priced.
+    'Rate Adequacy': {
+        'GWP': -0.01,
+        'retention': 0.005,
+        'sub': 0.01,
+        'ELR': -0.015,
+        'rate': 0.03,
+        'RARC': 0.02
     },
-    "ELR": {
-        "GWP": 0,    # ELR itself might not directly influence GWP.
-        "retention": -0.003,  # Higher ELR could indicate less profitable policies, potentially reducing retention rates.
-        "hit": 0,    # ELR might not directly affect the hit ratio.
-        "adequacy": -0.008,  # Higher ELR indicates lower rate adequacy.
-        "ELR": 0.01,    # This is the same metric, so the effect is direct.
-        "RARC": -0.007  # Higher ELR typically reduces RARC.
+    'RARC': {
+        'GWP': 0.005,
+        'retention': -0.01,
+        'sub': 0.02,
+        'ELR': 0.015,
+        'rate': -0.02,
+        'RARC': 0.03
+    },
+    'Sub to Quote': {
+        'GWP': 0.01,
+        'retention': 0.005,
+        'sub': -0.005,
+        'ELR': 0.02,
+        'rate': -0.01,
+        'RARC': 0.015
+    },
+    'Aggregate Exposure Limit': {
+        'GWP': -0.005,
+        'retention': 0.01,
+        'sub': 0.005,
+        'ELR': -0.02,
+        'rate': 0.015,
+        'RARC': 0.01
     }
-
 }
+
 
 
 def processGWP(rawData, dbc):
@@ -87,10 +94,10 @@ def processGWP(rawData, dbc):
     for i in rawData:
         data[i] = rawData[i] \
          + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['GWP'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['GWP'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['GWP'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['GWP'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['GWP'] * count))
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['GWP'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['GWP'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['GWP'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['GWP'] * count))
         count += 1
         
     count = 0
@@ -109,10 +116,10 @@ def processRetention(rawData, dbc):
     for i in rawData:
         data[i] = rawData[i] \
          + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['retention'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['retention'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['retention'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['retention'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['retention'] * count))  
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['retention'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['retention'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['retention'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['retention'] * count))
         count += 1
         
     count = 0
@@ -130,11 +137,11 @@ def processHits(rawData, dbc):
     count = 0
     for i in rawData:
         data[i] = rawData[i] \
-         + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['hit'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['hit'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['hit'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['hit'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['hit'] * count))    
+         + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['sub'] * count)) \
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['sub'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['sub'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['sub'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['sub'] * count))
         count += 1
         
     count = 0
@@ -142,7 +149,7 @@ def processHits(rawData, dbc):
         count = 0  
         for i in data:
             data[i] = data[i] \
-              + data[i] * (block.value * coefficients[block.metric]['hit'] * count * Data(dbc).calcPerc(block.filters))
+              + data[i] * (block.value * coefficients[block.metric]['sub'] * count * Data(dbc).calcPerc(block.filters))
             count += 1
                
     return data
@@ -152,19 +159,19 @@ def processAdequacy(rawData, dbc):
     count = 0
     for i in rawData:
         data[i] = rawData[i] \
-         + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['adequacy'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['adequacy'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['adequacy'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['adequacy'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['adequacy'] * count))    
+         + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['rate'] * count)) \
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['rate'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['rate'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['rate'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['rate'] * count))
         count += 1
-        
+    
     count = 0
     for block in st.session_state.basket.get: 
         count = 0  
         for i in data:
             data[i] = data[i] \
-              + data[i] * (block.value * coefficients[block.metric]['adequacy'] * count * Data(dbc).calcPerc(block.filters))
+              + data[i] * (block.value * coefficients[block.metric]['rate'] * count * Data(dbc).calcPerc(block.filters))
             
     return data
 
@@ -174,10 +181,10 @@ def processELR(rawData, dbc):
     for i in rawData:
         data[i] = rawData[i] \
          + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['ELR'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['ELR'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['ELR'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['ELR'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['ELR'] * count))    
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['ELR'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['ELR'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['ELR'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['ELR'] * count))
         count += 1
 
     count = 0
@@ -195,10 +202,10 @@ def processRARC(rawData, dbc):
     for i in rawData:
         data[i] = rawData[i] \
          + (rawData[i] * ((st.session_state.interest - 5.25) * coefficients['interest']['RARC'] * count)) \
-         + (rawData[i] * ((st.session_state.retention - 60) * coefficients['retention_rate']['RARC'] * count)) \
-         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['RARC'] * count)) \
-         + (rawData[i] * ((st.session_state.rateAdequacy) * coefficients['rate_adequacy']['RARC'] * count)) \
-         + (rawData[i] * ((st.session_state.subToQuote - 70) * coefficients['sub_to_quote']['RARC'] * count))    
+         + (rawData[i] * ((st.session_state.retention - 70) * coefficients['retention']['RARC'] * count)) \
+         + (rawData[i] * ((st.session_state.marketRARC) * coefficients['marketRARC']['RARC'] * count)) \
+         + (rawData[i] * ((st.session_state.subVolumes - 50) * coefficients['subVolumes']['RARC'] * count)) \
+         + (rawData[i] * ((st.session_state.inflation - 4.6) * coefficients['inflation']['RARC'] * count))
         count += 1
         
     count = 0
@@ -223,30 +230,29 @@ def show_graph_1():
 
     # Add cumulative GWP values as bars
     fig.add_trace(
-        go.Bar(x=list(data['cul'].keys()), y=list(data['cul'].values()), name='Cumulative GWP', marker_color='#e0301e'),
+        go.Bar(x=list(map(lambda key: key.split('-')[1], data['cul'].keys())), y=list(data['cul'].values()), name='Cumulative GWP', marker_color='#e0301e'),
         
     )    
 
     fig.add_trace(
-        go.Bar(x=list(data['acc'].keys()), y=list(data['acc'].values()), name='Actual GWP', marker_color='#eb8c00'),
+        go.Bar(x=list(map(lambda key: key.split('-')[1], data['acc'].keys())), y=list(data['acc'].values()), name='Monthly Bound GWP', marker_color='#eb8c00'),
     )
 
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), name='Target GWP', mode='lines', line=dict(color='#602320')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), name='Target GWP', mode='lines', line=dict(color='#602320')),
         
     )    
     
     
-
     #Add forecasted GWP values as a line
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), name='Projected GWP', mode='lines+markers', line=dict(color='#000000'), marker=dict(color='#000000')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],future.keys())), y=list(future.values()), name='Projected GWP', mode='lines+markers', line=dict(color='#000000'), marker=dict(color='#000000')),
     )
 
 
     # Customize the layout
     fig.update_layout(
-        title_text="GWP Actual vs Forecast",
+        title_text="Gross Written Premium",
         xaxis_title="Year",
         yaxis_title="Actual GWP",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
@@ -255,7 +261,7 @@ def show_graph_1():
     )
 
     # Customize axes
-    fig.update_xaxes(title_text="Year")
+    fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
 
     # Set custom y-axis range based on the data scale
     fig.update_yaxes(title_text="GWP ($)", secondary_y=False)
@@ -279,29 +285,29 @@ def show_graph_2():
 
      # Add year-on-year bars for renewing (continued) policies
     fig.add_trace(
-        go.Bar(x=list(data['cont'].keys()), y=list(data['cont'].values()), name='Renewing Policies', marker_color='#a32020'),
+        go.Bar(x=list(map(lambda key: key.split('-')[1],data['cont'].keys())), y=list(data['cont'].values()), name='Renewal Business', marker_color='#a32020'),
         secondary_y=False,
     )
     # Add year-on-year bars for new policies
     fig.add_trace(
-        go.Bar(x=list(data['new'].keys()), y=list(data['new'].values()), name='New Policies', marker_color='#eb8c00'),
+        go.Bar(x=list(map(lambda key: key.split('-')[1],data['new'].keys())), y=list(data['new'].values()), name='New Business', marker_color='#eb8c00'),
         secondary_y=False,
     )
 
     # Add a line for the retention rate
     
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), name='Target Retention', mode='lines', line=dict(color='#602320')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), name='Target Retention', mode='lines', line=dict(color='#602320')),
         secondary_y=True,
     )
     
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), name='Projected Retention', mode='lines+markers', line=dict(color='#000000'), marker=dict(color='#000000')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],future.keys())), y=list(future.values()), name='Projected Retention', mode='lines+markers', line=dict(color='#000000'), marker=dict(color='#000000')),
         secondary_y=True,
     )
 
     fig.add_trace(
-        go.Scatter(x=list(data['ret'].keys()), y=list(data['ret'].values()), name='Retention Rate', mode='lines+markers', line=dict(color='#e0301e'), marker=dict(color='#e0301e')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['ret'].keys())), y=list(data['ret'].values()), name='Retention Rate', mode='lines+markers', line=dict(color='#e0301e'), marker=dict(color='#e0301e')),
         secondary_y=True,
     )
     
@@ -309,16 +315,16 @@ def show_graph_2():
 
     # Customize the layout
     fig.update_layout(
-        title_text="Business Type split",
+        title_text="Business Type Split",
         xaxis_title="Year",
-        yaxis_title="Number of Policies",
+        yaxis_title="GWP ($)",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
         font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple"),
         barmode='stack',
     )
 
     # Customize axes
-    fig.update_xaxes(title_text="Year")
+    fig.update_xaxes(title_text=list(data['new'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
     fig.update_yaxes(title_text="Number of Policies", secondary_y=False)
     fig.update_yaxes(title_text="Retention Rate", range=[0, 100], secondary_y=True)
 
@@ -334,41 +340,41 @@ def show_graph_3():
     # Get the Hit Ratio data from the database
     data = Graph(DBC).HitRate(st.session_state.selections)
     
-    qfuture = processHits(data['qpred'], DBC)
-    bfuture = processHits(data['bpred'], DBC)
+    #qfuture = processHits(data['qpred'], DBC)
+    #bfuture = processHits(data['bpred'], DBC)
     sfuture = processHits(data['spred'], DBC)
 
     # Create a line chart for hit ratios
     fig = make_subplots(specs=[[{"secondary_y": False}]])
     
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), mode='lines', name='Target StB', line=dict(color='#602320'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), mode='lines', name='Target Sub to Bind', line=dict(color='#602320'))
     )
 
-    fig.add_trace(
-        go.Scatter(x=list(bfuture.keys()), y=list(bfuture.values()), mode='lines+markers', name='Projected QtB', line=dict(color='black'))
-    )
+    #fig.add_trace(
+    #    go.Scatter(x=list(bfuture.keys()), y=list(bfuture.values()), mode='lines+markers', name='Projected QtB', line=dict(color='black'))
+    #)
+    
+    #fig.add_trace(
+    #    go.Scatter(x=list(qfuture.keys()), y=list(qfuture.values()), mode='lines+markers', name='Projected StQ', line=dict(color='black'))
+    #)
     
     fig.add_trace(
-        go.Scatter(x=list(qfuture.keys()), y=list(qfuture.values()), mode='lines+markers', name='Projected StQ', line=dict(color='black'))
-    )
-    
-    fig.add_trace(
-        go.Scatter(x=list(sfuture.keys()), y=list(sfuture.values()), mode='lines+markers', name='Projected StB', line=dict(color='black'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],sfuture.keys())), y=list(sfuture.values()), mode='lines+markers', name='Projected Sub to Bind', line=dict(color='black'))
     )
 
     # Add a line for the measure of the number of inquiries that make it to a quote
-    fig.add_trace(
-        go.Scatter(x=list(data['subQuote'].keys()), y=list(data['subQuote'].values()), mode='lines+markers', name='Sub to Quote', line=dict(color='#eb8c00'), marker=dict(color='#eb8c00'))
-    )
+    #fig.add_trace(
+    #    go.Scatter(x=list(data['subQuote'].keys()), y=list(data['subQuote'].values()), mode='lines+markers', name='Sub to Quote', line=dict(color='#eb8c00'), marker=dict(color='#eb8c00'))
+    #)
 
     # Add a line for the measure of bound policies divided by quoted policies
-    fig.add_trace(
-        go.Scatter(x=list(data['quoteBound'].keys()), y=list(data['quoteBound'].values()), mode='lines+markers', name='Quote to Bind', line=dict(color='#e0301e'), marker=dict(color='#e0301e'))
-    )
+    #fig.add_trace(
+    #    go.Scatter(x=list(data['quoteBound'].keys()), y=list(data['quoteBound'].values()), mode='lines+markers', name='Quote to Bind', line=dict(color='#e0301e'), marker=dict(color='#e0301e'))
+    #)
     
     fig.add_trace(
-        go.Scatter(x=list(data['subBound'].keys()), y=list(data['subBound'].values()), mode='lines+markers', name='Sub to Bind', line=dict(color='orange'), marker=dict(color='orange'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['subBound'].keys())), y=list(data['subBound'].values()), mode='lines+markers', name='Sub to Bind', line=dict(color='orange'), marker=dict(color='orange'))
     )
 
 
@@ -385,7 +391,8 @@ def show_graph_3():
         font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple")
     )
 
-    fig.update_yaxes(title_text="Hit Ratio (%)", range=[0, 100], secondary_y=False)
+    fig.update_yaxes(title_text="Hit Ratio (%)", secondary_y=False)
+    fig.update_xaxes(title_text=list(data['subBound'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
     
     # Display the figure
     st.plotly_chart(fig)
@@ -404,26 +411,26 @@ def show_graph_4():
 
     # Add ELR actual values as bars (orange color)
     fig.add_trace(
-        go.Bar(x=list(data['acc'].keys()), y=list(data['acc'].values()), name='Actual ELR', marker_color='#eb8c00'),
+        go.Bar(x=list(map(lambda key: key.split('-')[1],data['acc'].keys())), y=list(data['acc'].values()), name='Monthly Avg.', marker_color='#eb8c00'),
         secondary_y=False,
     )
 
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), name='Target ELR', mode='lines', line=dict(color='#602320')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), name='Target ELR', mode='lines', line=dict(color='#602320')),
     )
 
     # Add moving average line (green color)
     fig.add_trace(
-        go.Scatter(x=list(data['cul'].keys()), y=list(data['cul'].values()), name='Moving Average', mode='lines+markers', line=dict(color='red')),
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['cul'].keys())), y=list(data['cul'].values()), name='YOA Avg.', mode='lines+markers', line=dict(color='red')),
     )
     
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), mode='lines+markers', name='Prejected ELR', line=dict(color='black'), marker=dict(color='black'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],future.keys())), y=list(future.values()), mode='lines+markers', name='Projected Avg.', line=dict(color='black'), marker=dict(color='black'))
     )
 
     # Customize the layout
     fig.update_layout(
-        title_text="ELR with Moving Average",
+        title_text="ELR",
         xaxis_title="Date",
         yaxis_title="ELR",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
@@ -432,7 +439,7 @@ def show_graph_4():
     )
 
     # Customize axes
-    fig.update_xaxes(title_text="Date")
+    fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
     fig.update_yaxes(title_text="ELR", secondary_y=False)
 
     # Display the figure
@@ -453,33 +460,34 @@ def show_graph_5():
     # Add a line for the measure of the number of inquiries that make it to a quote
 
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), mode='lines', name='Target rate', line=dict(color='#602320'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), mode='lines', name='Target Rate Adequacy', line=dict(color='#602320'))
     )
 
     # Add a line for the measure of bound policies divided by quoted policies
     fig.add_trace(
-        go.Scatter(x=list(data['acc'].keys()), y=list(data['acc'].values()), mode='lines+markers', name='Actual rate', line=dict(color='#eb8c00'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['acc'].keys())), y=list(data['acc'].values()), mode='lines+markers', name='Monthly Avg.', line=dict(color='#eb8c00'))
     )
     
     fig.add_trace(
-        go.Scatter(x=list(data['cul'].keys()), y=list(data['cul'].values()), mode='lines+markers', name='Rolling Average', line=dict(color='red'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['cul'].keys())), y=list(data['cul'].values()), mode='lines+markers', name='YOA Avg.', line=dict(color='red'))
     )
     
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), mode='lines+markers', name='Projected Rate', line=dict(color='black'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],future.keys())), y=list(future.values()), mode='lines+markers', name='Projected Avg.', line=dict(color='black'))
     )
 
 
     # Customize the layout
     fig.update_layout(
-        title_text="Rate Adequecy",
+        title_text="Rate Adequacy",
         xaxis_title="Year",
         yaxis_title="Rate Ratio (%)",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
         font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple")
     )
     
-    fig.update_yaxes(secondary_y=False)
+    fig.update_yaxes(secondary_y=False, range=[-1,1])
+    fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
 
     # Display the figure
     st.plotly_chart(fig)
@@ -489,40 +497,44 @@ def show_graph_6():
     DBC = DBController("database.db")
     
     # Get the Hit Ratio data from the database
-    data = Graph(DBC).RARC
+    data = Graph(DBC).RARC(st.session_state.selections)
     
     future = processRARC(data['pred'], DBC)
     
     # Create a line chart for hit ratios
     fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": False}]])
 
     # Add a line for the measure of the number of inquiries that make it to a quote
     fig.add_trace(
-        go.Scatter(x=list(data['aim'].keys()), y=list(data['aim'].values()), mode='lines+markers', name='Target RARC', line=dict(color='#602320'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['aim'].keys())), y=list(data['aim'].values()), mode='lines', name='Target RARC', line=dict(color='#602320'))
     )
 
     # Add a line for the measure of bound policies divided by quoted policies
     fig.add_trace(
-        go.Scatter(x=list(data['acc'].keys()), y=list(data['acc'].values()), mode='lines+markers', name='Actual RARC', line=dict(color='#eb8c00'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['acc'].keys())), y=list(data['acc'].values()), mode='lines+markers', name='Monthly Avg.', line=dict(color='#eb8c00'))
     )
     
     fig.add_trace(
-        go.Scatter(x=list(future.keys()), y=list(future.values()), mode='lines+markers', name='Projected RARC', line=dict(color='black'), marker=dict(color='black'))
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],future.keys())), y=list(future.values()), mode='lines+markers', name='Projected Avg.', line=dict(color='black'), marker=dict(color='black'))
     )
+
+    fig.add_trace(
+        go.Scatter(x=list(map(lambda key: key.split('-')[1],data['cul'].keys())), y=list(data['cul'].values()), mode='lines+markers', name='YOA Avg.', line=dict(color='red'))
+    )    
 
     # Customize the layout
     fig.update_layout(
         title_text="RARC",
         xaxis_title="Year",
-        yaxis_title="RARC",
+        yaxis_title="RARC (%)",
         legend=dict(orientation='h', y=1.0, x=0.5, xanchor='center', yanchor='bottom'),
-        font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple"),
-        xaxis=dict(
-            tickmode='array',
-            tickvals=list(data['aim'].keys()),
-            ticktext=[f"{int(year)} H2" if isinstance(year, float) and year % 1 != 0 else str(int(year)) for year in data['aim'].keys()]
-        )
+        font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple")
     )
+        
+    fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
+    fig.update_yaxes(secondary_y=False, range=[-10,10])
+    
 
     # Display the figure
     st.plotly_chart(fig)
@@ -557,7 +569,7 @@ def show_graph_7():
     )
 
     # Customize axes
-    fig.update_xaxes(title_text="Percentage of Polocies")
+    fig.update_xaxes(title_text="Percentage of Policies")
     fig.update_yaxes(title_text="Broker")
 
     # Display the figure

@@ -97,7 +97,7 @@ if st.session_state['page'] == 'internal':
         # Streamlit code for the dropdown menus and inputs
         metric = st.sidebar.selectbox(
             'Select Metric:',
-            ('Price', 'Risk Appetite', 'ELR')
+            ('Rate Adequacy', 'RARC', 'Sub to Quote', 'Aggregate Exposure Limit')
         )
     
         value = st.sidebar.slider("Select Modifier:", min_value=-10.0, max_value=10.0, value=0.0, step=0.01, format='%f%%')
@@ -144,10 +144,10 @@ else:
     internal_factors_button = st.sidebar.button('Internal Factors :arrow_right:')
     
     st.session_state['interest'] = st.sidebar.slider("Interest Rates", min_value=0.0, max_value=10.0, value=5.25, step=0.01, format='%f%%')
-    st.session_state['retention'] = st.sidebar.slider("Retention Rates", min_value=0.0, max_value=100.0, value=60.0, step=0.1, format='%f%%')
-    st.session_state['inflation'] = st.sidebar.slider("Inflation", min_value=0.0, max_value=10.0, value=4.60, step=0.01, format='%f%%')
-    st.session_state['rateAdequacy'] = st.sidebar.slider("Rate Adequecy", min_value=-2.5, max_value=2.5, value=0.0, step=0.01, format='%f%%')
-    st.session_state['subToQuote'] = st.sidebar.slider("Sub to Quote", min_value=0.0, max_value=100.0, value=70.0, step=0.1, format='%f%%')
+    st.session_state['inflation'] = st.sidebar.slider("Claims Inflation", min_value=0.0, max_value=10.0, value=4.60, step=0.01, format='%f%%')
+    st.session_state['marketRARC'] = st.sidebar.slider("Market RARC", min_value=-10.0, max_value=10.0, value=0.0, step=0.01, format='%f%%')
+    st.session_state['subVolumes'] = st.sidebar.slider("Sub Volumes", min_value=0.0, max_value=100.0, value=50.0, step=0.1, format='%f%%')
+    st.session_state['retention'] = st.sidebar.slider("Retention Rate", min_value=0.0, max_value=100.0, value=70.0, step=0.1, format='%f%%')
 
     if internal_factors_button:
         switch_to_internal_factors()

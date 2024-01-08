@@ -609,7 +609,6 @@ class Graph():
       
     aim = dict(sorted(aim.items()))
       
-    print(acc, cul)
     return {'acc': acc, 'aim': aim, 'cul': cul, 'pred': pred}
   
 

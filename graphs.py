@@ -533,7 +533,7 @@ def show_graph_6():
     )
         
     fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
-    fig.update_yaxes(secondary_y=False, range=[-10,10])
+    fig.update_yaxes(secondary_y=False, range=[-5,5])
     
 
     # Display the figure

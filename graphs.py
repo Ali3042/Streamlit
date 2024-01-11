@@ -486,7 +486,7 @@ def show_graph_5():
         font=dict(family="Courier New, monospace", size=18, color="RebeccaPurple")
     )
     
-    fig.update_yaxes(secondary_y=False, range=[-1,1])
+    fig.update_yaxes(secondary_y=False)
     fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
 
     # Display the figure
@@ -533,7 +533,7 @@ def show_graph_6():
     )
         
     fig.update_xaxes(title_text=list(data['acc'].keys())[0].split("-")[0]+" YOA", tickvals=list(month_map.keys()), ticktext=list(month_map.values()))
-    fig.update_yaxes(secondary_y=False, range=[-5,5])
+    fig.update_yaxes(secondary_y=False)
     
 
     # Display the figure
